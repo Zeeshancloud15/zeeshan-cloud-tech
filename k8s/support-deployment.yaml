@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: support-service
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: support-service
+
+  template:
+    metadata:
+      labels:
+        app: support-service
+
+    spec:
+      containers:
+      - name: support-service
+
+        image: zeeshan/support-service:v1
+
+        ports:
+        - containerPort: 3000
