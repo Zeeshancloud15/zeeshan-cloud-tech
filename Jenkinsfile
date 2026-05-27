@@ -16,7 +16,7 @@ pipeline {
 
         AI_IMAGE = "zeeshancloud15/ai-service:${BUILD_NUMBER_TAG}"
 
-        K8S_SERVER = 'ubuntu@13.50.106.43'
+        K8S_SERVER = 'ubuntu@16.170.167.227'
 
         S3_BUCKET = 'zeeshanagency'
     }
