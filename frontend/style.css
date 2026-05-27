@@ -1,0 +1,33 @@
+body{
+    margin:0;
+    font-family:Arial;
+    background:#f4f4f4;
+}
+
+header{
+    background:black;
+    color:white;
+    padding:20px;
+    text-align:center;
+}
+
+.hero{
+    padding:50px;
+    text-align:center;
+}
+
+input{
+    padding:10px;
+    margin:10px;
+}
+
+button{
+    padding:10px 20px;
+    margin:10px;
+}
+
+#output{
+    margin-top:30px;
+    font-size:22px;
+    text-align:center;
+}
