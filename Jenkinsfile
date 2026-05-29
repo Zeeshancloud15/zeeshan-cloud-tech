@@ -92,20 +92,28 @@ pipeline {
             }
         }
 
-        stage('Update Kubernetes YAML') {
+        stage('Delete Old Kubernetes Resources') {
 
             steps {
 
-                sh """
+                sshagent(['k8s-ssh1']) {
 
-                    sed -i 's|image:.*frontend.*|image: ${FRONTEND_IMAGE}|g' k8s/frontend-deployment.yaml
+                    sh """
 
-                    sed -i 's|image:.*user-service.*|image: ${USER_IMAGE}|g' k8s/user-deployment.yaml
+ssh -o StrictHostKeyChecking=no ${K8S_SERVER} '
 
-                    sed -i 's|image:.*support-service.*|image: ${SUPPORT_IMAGE}|g' k8s/support-deployment.yaml
+kubectl delete ingress --all --ignore-not-found=true
 
-                    sed -i 's|image:.*ai-service.*|image: ${AI_IMAGE}|g' k8s/ai-deployment.yaml
-                """
+kubectl delete svc frontend-service user-service support-service ai-service --ignore-not-found=true
+
+kubectl delete deployment frontend user-service support-service ai-service --ignore-not-found=true
+
+kubectl delete namespace ingress-nginx --ignore-not-found=true
+
+'
+
+"""
+                }
             }
         }
 
@@ -117,15 +125,38 @@ pipeline {
 
                     sh """
 
-                    ssh -o StrictHostKeyChecking=no ${K8S_SERVER} '
+ssh -o StrictHostKeyChecking=no ${K8S_SERVER} '
 
-                    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
 
-                    kubectl patch svc ingress-nginx-controller -n ingress-nginx -p "{\"spec\":{\"type\":\"NodePort\"}}"
+sleep 60
 
-                    '
-                    """
+kubectl patch svc ingress-nginx-controller -n ingress-nginx -p '\''{"spec":{"type":"NodePort"}}'\''
+
+kubectl get svc -n ingress-nginx
+
+'
+
+"""
                 }
+            }
+        }
+
+        stage('Update Kubernetes YAML') {
+
+            steps {
+
+                sh """
+
+sed -i 's|image:.*frontend.*|image: ${FRONTEND_IMAGE}|g' k8s/frontend-deployment.yaml
+
+sed -i 's|image:.*user-service.*|image: ${USER_IMAGE}|g' k8s/user-deployment.yaml
+
+sed -i 's|image:.*support-service.*|image: ${SUPPORT_IMAGE}|g' k8s/support-deployment.yaml
+
+sed -i 's|image:.*ai-service.*|image: ${AI_IMAGE}|g' k8s/ai-deployment.yaml
+
+"""
             }
         }
 
@@ -137,37 +168,45 @@ pipeline {
 
                     sh """
 
-                    scp -o StrictHostKeyChecking=no k8s/* ${K8S_SERVER}:~/
+scp -o StrictHostKeyChecking=no k8s/* ${K8S_SERVER}:~/
 
-                    ssh -o StrictHostKeyChecking=no ${K8S_SERVER} '
+ssh -o StrictHostKeyChecking=no ${K8S_SERVER} '
 
-                    kubectl apply -f frontend-deployment.yaml
+kubectl apply -f frontend-deployment.yaml
 
-                    kubectl apply -f frontend-service.yaml
+kubectl apply -f frontend-service.yaml
 
-                    kubectl apply -f user-deployment.yaml
+kubectl apply -f user-deployment.yaml
 
-                    kubectl apply -f user-service.yaml
+kubectl apply -f user-service.yaml
 
-                    kubectl apply -f support-deployment.yaml
+kubectl apply -f support-deployment.yaml
 
-                    kubectl apply -f support-service.yaml
+kubectl apply -f support-service.yaml
 
-                    kubectl apply -f ai-deployment.yaml
+kubectl apply -f ai-deployment.yaml
 
-                    kubectl apply -f ai-service.yaml
+kubectl apply -f ai-service.yaml
 
-                    kubectl apply -f ingress.yaml
+kubectl apply -f ingress.yaml
 
-                    kubectl rollout status deployment/frontend
+kubectl rollout status deployment/frontend
 
-                    kubectl rollout status deployment/user
+kubectl rollout status deployment/user-service
 
-                    kubectl rollout status deployment/support
+kubectl rollout status deployment/support-service
 
-                    kubectl rollout status deployment/ai
-                    '
-                    """
+kubectl rollout status deployment/ai-service
+
+kubectl get pods -o wide
+
+kubectl get svc
+
+kubectl get ingress
+
+'
+
+"""
                 }
             }
         }
@@ -177,7 +216,7 @@ pipeline {
             steps {
 
                 sh '''
-                    curl http://zeeshan.agency:32234
+                    curl http://16.16.99.148:32234
                 '''
             }
         }
