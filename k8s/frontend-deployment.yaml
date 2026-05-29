@@ -1,10 +1,12 @@
 apiVersion: apps/v1
+
 kind: Deployment
 
 metadata:
   name: frontend
 
 spec:
+
   replicas: 2
 
   selector:
@@ -12,15 +14,19 @@ spec:
       app: frontend
 
   template:
+
     metadata:
       labels:
         app: frontend
 
     spec:
+
       containers:
+
       - name: frontend
 
-        image: zeeshan/frontend:v1
+        image: zeeshancloud15/frontend:latest
 
         ports:
+
         - containerPort: 80
