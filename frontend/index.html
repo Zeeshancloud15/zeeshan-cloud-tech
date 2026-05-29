@@ -1,52 +1,27 @@
 <!DOCTYPE html>
+
 <html>
 
 <head>
-    <title>Zeeshan Cloud Tech</title>
-    <link rel="stylesheet" href="style.css">
+
+    <title>TechApp</title>
+
 </head>
 
 <body>
 
-<header>
-    <h1>Zeeshan Cloud Tech</h1>
-</header>
+    <h1>Welcome To TechApp</h1>
 
-<section class="hero">
+    <button onclick="getUsers()">Users</button>
 
-    <h2>Cloud & IT Solutions</h2>
+    <button onclick="getSupport()">Support</button>
 
-    <input type="text"
-    id="name"
-    placeholder="Enter Name">
+    <button onclick="getAI()">AI</button>
 
-    <input type="email"
-    id="email"
-    placeholder="Enter Email">
+    <h2 id="result"></h2>
 
-    <button onclick="registerUser()">
-        Register
-    </button>
-
-    <br><br>
-
-    <button onclick="getUsers()">
-        User Service
-    </button>
-
-    <button onclick="getSupport()">
-        Support Service
-    </button>
-
-    <button onclick="getAI()">
-        AI Service
-    </button>
-
-</section>
-
-<div id="output"></div>
-
-<script src="script.js"></script>
+    <script src="app.js"></script>
 
 </body>
+
 </html>
